@@ -1,0 +1,33 @@
+---
+name: Setup the project for the game of life project
+on:
+  push:
+    branches:
+      -  main
+  pull_request:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the code from the github
+        uses: actions/checkout@v4
+      - name: Install java 8 for the project
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Install maven for the project
+        run: sudo apt-get install maven -y
+
+      - name: Build the code for the project
+        run: mvn clean install
+
+      - name: Deploy to Tomcat server
+        run: |
+          WAR_FILE=$(ls gameoflife-web/target/*.war | head -n 1) 
+          APP_NAME=gameoflife
+          curl -u "${{secrets.TOMCAT_USERNAME}}:${{secrets.TOMCAT_PASSWORD}}" \
+          --upload-file "$WAR_FILE" \
+          "http://${{secrets.HOST_URL}}:8080/manager/text/deploy?path=/$APP_NAME&update=true"
