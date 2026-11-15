@@ -3,7 +3,7 @@ name: Setup the project for the game of life project
 on:
   push:
     branches:
-      -  main
+      -  master
   pull_request:
   workflow_dispatch:
 jobs:
